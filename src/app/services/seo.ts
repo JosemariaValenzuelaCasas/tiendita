@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-
+import { isPlatformBrowser } from '@angular/common';
 export interface BasicSeo {
   title?: string;
   description?: string;
@@ -15,7 +15,8 @@ export interface BasicSeo {
 export class Seo {
   private titleService = inject(Title);
   private metaService = inject(Meta);
-
+  private platformId = inject(PLATFORM_ID);
+  
   setAll(seo: BasicSeo) {
     if (seo.title) this.setTitle(seo.title);
 
@@ -66,10 +67,12 @@ export class Seo {
   }
 
   setCanonical(url: string) {
-    let link: HTMLLinkElement = document.querySelector("link[rel='canonical']") || 
-                                document.createElement('link');
-    link.setAttribute('rel', 'canonical');
-    link.setAttribute('href', url);
-    document.head.appendChild(link);
+    if (isPlatformBrowser(this.platformId)) {
+      let link: HTMLLinkElement =
+        document.querySelector("link[rel='canonical']") || document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      link.setAttribute('href', url);
+      document.head.appendChild(link);
+    }
   }
 }
